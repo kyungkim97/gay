@@ -11,5 +11,6 @@ async def on_ready():
 
 
 bot.load_extension('mooseun_cog')
+bot.load_extension('exitcode')
 
 bot.run(os.environ['BOT_TOKEN'])
