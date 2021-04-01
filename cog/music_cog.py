@@ -2,7 +2,7 @@ from discord.ext.commands import Cog, Context, Bot
 from discord.ext import commands
 
 
-class Exitcode(Cog):
+class MusicCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -19,4 +19,4 @@ class Exitcode(Cog):
 
 
 def setup(bot: Bot):
-    bot.add_cog(Exitcode(bot))
+    bot.add_cog(MusicCog(bot))

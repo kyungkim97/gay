@@ -7,10 +7,10 @@ bot = Bot('.')
 
 @bot.event
 async def on_ready():
-    print('is on')
+    print(f'{bot.user.display_name} is on')
 
 
-bot.load_extension('mooseun_cog')
-bot.load_extension('exitcode')
+bot.load_extension('cog/music_cog')
+bot.load_extension('cog/test_cog')
 
 bot.run(os.environ['BOT_TOKEN'])
