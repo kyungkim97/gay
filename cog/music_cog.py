@@ -1,5 +1,6 @@
 from urllib.parse import parse_qs, urlparse
 
+import discord
 import youtube_dl as youtube_dl
 from discord import FFmpegPCMAudio
 from discord.ext.commands import Cog, Context, Bot
@@ -27,13 +28,13 @@ class MusicCog(Cog):
         self.bot = bot
 
     @commands.command()
-    async def join(self, ctx: Context):
+    async def j(self, ctx: Context):
         if ctx.author.voice is not None:
             await ctx.author.voice.channel.connect()
             await ctx.send('접속함')
 
     @commands.command()
-    async def play(self, ctx: Context, url: str):
+    async def p(self, ctx: Context, url: str):
         voice = None
         for vc in self.bot.voice_clients:
             if vc.guild == ctx.guild:
@@ -56,13 +57,31 @@ class MusicCog(Cog):
 
         if voice is not None:
             voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"))
-            await ctx.send(title + "is playing now")
+            await ctx.send(title + " is playing now")
         else:
             await ctx.send('오류가발생했음')
 
     @commands.command()
-    async def leave(self, ctx: Context):
-        await self.bot.voice.channel.disconnect()
+    async def pause(self, ctx: Context):
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)  # 봇의 음성 관련 정보
+        if voice.is_playing():  # 노래가 재생중이면
+            voice.pause()  # 일시정지
+        else:
+            await ctx.send("재생중인 곡 없음")  # 오류(?)
+
+    # 다시 재생
+    @commands.command()
+    async def resume(self, ctx: Context):
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)  # 봇의 음성 관련 정보
+        if voice.is_paused():  # 일시정지 상태이면
+            voice.resume()
+        else:
+            await ctx.send("일시정지 아님")  # 오류(?)
+
+    # 정지
+    @commands.command()
+    async def stop(self, ctx: Context):
+        await self.bot.voice_clients[0].disconnect()
         await ctx.send('나감')
 
 
