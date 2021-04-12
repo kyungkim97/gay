@@ -2,7 +2,7 @@ from urllib.parse import parse_qs, urlparse
 
 import discord
 import youtube_dl as youtube_dl
-from discord import FFmpegPCMAudio
+from discord import FFmpegPCMAudio, TextChannel
 from discord.ext.commands import Cog, Context, Bot
 from discord.ext import commands
 
@@ -27,20 +27,16 @@ class MusicCog(Cog):
     def __init__(self, bot):
         self.bot = bot
 
+        self.playing = False
+        self.queue = list()
+
     @commands.command()
     async def j(self, ctx: Context):
         if ctx.author.voice is not None:
             await ctx.author.voice.channel.connect()
             await ctx.send('접속함')
 
-    @commands.command()
-    async def p(self, ctx: Context, url: str):
-        voice = None
-        for vc in self.bot.voice_clients:
-            if vc.guild == ctx.guild:
-                voice = vc
-                break
-
+    def download_audio(self, url):
         option = {
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -55,11 +51,37 @@ class MusicCog(Cog):
             info = ydl.extract_info(url, download=False)
             title = info["title"]
 
-        if voice is not None:
-            voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"))
-            await ctx.send(title + " is playing now")
+        return title
+
+    def play_next(self, error, voice):
+        if self.queue:
+            url = self.queue.pop(0)
+
+            self.download_audio(url)
+
+            voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"),
+                       after=lambda error_: self.play_next(error_, voice))
+
+    @commands.command()
+    async def p(self, ctx: Context, url: str):
+        if self.playing:
+            self.queue.append(url)
+            await ctx.send('노래가 추가')
         else:
-            await ctx.send('오류가발생했음')
+            voice = None
+            for vc in self.bot.voice_clients:
+                if vc.guild == ctx.guild:
+                    voice = vc
+                    break
+
+            title = self.download_audio(url)
+
+            if voice is not None:
+                voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"),
+                           after=lambda error: self.play_next(error, voice))
+                await ctx.send(title + " is playing now")
+            else:
+                await ctx.send('오류가발생했음')
 
     @commands.command()
     async def pause(self, ctx: Context):
