@@ -1,4 +1,4 @@
-import os
+from sys import argv
 
 from discord.ext.commands import Bot
 
@@ -13,6 +13,4 @@ async def on_ready():
 bot.load_extension('cog.music_cog')
 bot.load_extension('cog.test_cog')
 
-bot.run(os.environ['BOT_TOKEN'])
-
-
+bot.run(argv[1])
