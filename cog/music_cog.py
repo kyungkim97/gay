@@ -1,3 +1,4 @@
+from os.path import isfile
 from urllib.parse import parse_qs, urlparse
 
 import discord
@@ -61,6 +62,8 @@ class MusicCog(Cog):
 
             voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"),
                        after=lambda error_: self.play_next(error_, voice))
+        else:
+            self.playing = False
 
     @commands.command()
     async def p(self, ctx: Context, url: str):
@@ -73,13 +76,16 @@ class MusicCog(Cog):
                 if vc.guild == ctx.guild:
                     voice = vc
                     break
-
-            title = self.download_audio(url)
+            if not isfile(filename := "file/" + extract_video_id(url) + ".mp3"):
+                title = self.download_audio(url)
+            else:
+                title = '노래'
 
             if voice is not None:
-                voice.play(FFmpegPCMAudio("file/" + extract_video_id(url) + ".mp3"),
+                voice.play(FFmpegPCMAudio(filename),
                            after=lambda error: self.play_next(error, voice))
                 await ctx.send(title + " is playing now")
+                self.playing = True
             else:
                 await ctx.send('오류가발생했음')
 
