@@ -94,6 +94,7 @@ class MusicCog(Cog):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)  # 봇의 음성 관련 정보
         if voice.is_playing():  # 노래가 재생중이면
             voice.pause()  # 일시정지
+            await ctx.send('노래 멈춤')
         else:
             await ctx.send("재생중인 곡 없음")  # 오류(?)
 
@@ -103,6 +104,7 @@ class MusicCog(Cog):
         voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)  # 봇의 음성 관련 정보
         if voice.is_paused():  # 일시정지 상태이면
             voice.resume()
+            await ctx.send('노래 다시 재생')
         else:
             await ctx.send("일시정지 아님")  # 오류(?)
 
