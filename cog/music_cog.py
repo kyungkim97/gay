@@ -98,6 +98,17 @@ class MusicCog(Cog):
         else:
             await ctx.send("재생중인 곡 없음")  # 오류(?)
 
+    @commands.command()
+    async def skip(self, ctx: Context):
+        voice = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)  # 봇의 음성 관련 정보
+        if voice.is_playing():  # 노래가 재생중이면
+            # voice.skip()  # 다음노래로
+            voice.stop()
+            await ctx.send('다음곡')
+            await self.p(ctx, self.queue.pop(0))
+        else:
+            await ctx.send("재생중인 곡 없음")  # 오류(?)
+
     # 다시 재생
     @commands.command()
     async def resume(self, ctx: Context):
@@ -110,7 +121,7 @@ class MusicCog(Cog):
 
     # 정지
     @commands.command()
-    async def stop(self, ctx: Context):
+    async def leave(self, ctx: Context):
         await self.bot.voice_clients[0].disconnect()
         await ctx.send('나감')
 
