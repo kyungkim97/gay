@@ -69,7 +69,8 @@ class MusicCog(Cog):
     async def p(self, ctx: Context, url: str):
         if self.playing:
             self.queue.append(url)
-            await ctx.send('노래가 추가')
+            await ctx.send('노래가 추가 '
+                           '잠시만 기다려 주세요')
         else:
             voice = None
             for vc in self.bot.voice_clients:
