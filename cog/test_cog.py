@@ -1,12 +1,10 @@
-from asyncio import sleep
-
 from discord.ext import commands
+from discord.ext import tasks
 from discord.ext.commands import Cog, Context, Bot
 
 from bitcoin import get_doge, get_bitcoin, get_ethereum
 from corona import get_corona
 from hangang import get_temperature
-from discord.ext import tasks
 
 
 class TestCog(Cog):
