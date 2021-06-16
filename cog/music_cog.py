@@ -30,6 +30,7 @@ class MusicCog(Cog):
 
         self.playing = False
         self.queue = list()
+        self.is_repeated = False
 
     @commands.command()
     async def j(self, ctx: Context):
@@ -56,7 +57,10 @@ class MusicCog(Cog):
 
     def play_next(self, error, voice):
         if self.queue:
-            url = self.queue.pop(0)
+            if self.is_repeated:
+                url = self.queue[0]
+            else:
+                url = self.queue.pop(0)
 
             self.download_audio(url)
 
@@ -125,6 +129,15 @@ class MusicCog(Cog):
     async def leave(self, ctx: Context):
         await self.bot.voice_clients[0].disconnect()
         await ctx.send('나감')
+
+    @commands.command()
+    async def repeat(self, ctx: Context):
+        if self.is_repeated:
+            self.is_repeated = False
+            await ctx.send('repeat disabled')
+        else:
+            self.is_repeated = True
+            await ctx.send('repeat enabled')
 
 
 def setup(bot: Bot):
